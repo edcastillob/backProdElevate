@@ -4,16 +4,17 @@ const fs = require("fs");
 const path = require("path");
 const { DB_USER, DB_PASSWORD, DB_HOST, DB_NAME } = process.env;
 
-const sequelize = new Sequelize(
-  `postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}/${DB_NAME}`,
-  {
-    logging: false,
-    native: false,
-    // direct: {
-    //   freezeTableName: true
-    // }
-  }
-);
+const {DB_DEPLOY } = process.env;
+const sequelize = new Sequelize( DB_DEPLOY,
+{
+
+  dialect: 'postgres',
+  protocol: 'postgres',
+  dialectOptions: {
+    ssl: true,
+  },
+});
+
 
 const basename = path.basename(__filename);
 
