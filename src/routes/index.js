@@ -52,7 +52,7 @@ router.post("/login", passport.authenticate("local"), (req, res) => {
   const { name, identification, numPhone, address, image, email } =
     req.user.dataValues;
   res.setHeader("Access-Control-Allow-Credentials", "true"); // Habilitar las credenciales
-  res.setHeader("Access-Control-Allow-Origin", "http://localhost:5173"); // Define aquí la URL de tu frontend
+  res.setHeader("Access-Control-Allow-Origin", "https://prodelevate.netlify.app/"); // Define aquí la URL de tu frontend
   res.send({
     User: {
       name,
