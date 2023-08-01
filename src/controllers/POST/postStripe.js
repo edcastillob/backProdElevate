@@ -1,7 +1,7 @@
 const Stripe = require("stripe");
 require("dotenv").config();
-
-const { STRIPE_KEY, YOUR_DOMAIN } = process.env;
+const YOUR_DOMAIN = 'https://prodelevate.netlify.app';
+// const { STRIPE_KEY, YOUR_DOMAIN } = process.env;
 
 //const stripe = Stripe(STRIPE_KEY);
 
