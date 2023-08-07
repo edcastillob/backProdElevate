@@ -1,37 +1,34 @@
 const { User, Role } = require("../../db");
-const { Sequelize } = require('sequelize');
-const { conn: sequelize  } = require("../../db");
-// const { sequelize } = require('../../models/User.js'); 
+const { Sequelize } = require("sequelize");
+const { conn: sequelize } = require("../../db");
+// const { sequelize } = require('../../models/User.js');
+const ENDPOINT = "https://prodelevate.netlify.app/";
 const UserModel = sequelize.models.User;
 
 const nodemailer = require("nodemailer");
 const Mailgen = require("mailgen");
 
-
-
-
-
-
 /**  Notificacion de Creacion de producto  **/
 const sendMailer = async (product) => {
-
-  const usersAdmin = await User.findAll({ 
+  const usersAdmin = await User.findAll({
     where: { roleId: 1 },
-    include: [{
-      model: Role, 
-      attributes: ['id']
-    }]
+    include: [
+      {
+        model: Role,
+        attributes: ["id"],
+      },
+    ],
   });
 
   if (!usersAdmin || usersAdmin.length === 0) {
-    return res.status(404).json({ message: "No se encontraron usuarios con roleId 1" });
+    return res
+      .status(404)
+      .json({ message: "No se encontraron usuarios con roleId 1" });
   }
 
   const emails = usersAdmin.map((user) => user.email);
 
-  console.log(emails)
-
-
+  console.log(emails);
 
   try {
     //  const { email } = req.params;
@@ -50,7 +47,7 @@ const sendMailer = async (product) => {
       theme: "cerberus",
       product: {
         name: "Alerta!! Creación de Nuevo producto",
-        link: "https://prodelevate.netlify.app/dashboard",
+        link: `${ENDPOINT}dashboard`,
         copyright: "Copyright © 2023 ProdElevate. All rights reserved.",
       },
     });
@@ -76,7 +73,7 @@ const sendMailer = async (product) => {
           button: {
             color: "#000924",
             text: "Go to Dashboard",
-            link: "https://prodelevate.netlify.app/dashboard",
+            link: `${ENDPOINT}dashboard`,
           },
         },
         // outro: 'Revisa el inventario del producto'
@@ -84,12 +81,11 @@ const sendMailer = async (product) => {
     };
     const mail = MailGenerator.generate(response);
 
-    
-   const message = {
-      from: "prodelevatepf@gmail.com", 
-      to: emails, 
-      subject: "Registro de nuevo producto", 
-      html: mail
+    const message = {
+      from: "prodelevatepf@gmail.com",
+      to: emails,
+      subject: "Registro de nuevo producto",
+      html: mail,
     };
 
     await transporter.sendMail(message);
@@ -100,24 +96,25 @@ const sendMailer = async (product) => {
 
 /**  Notificacion de nuevo usuario  **/
 const sendMailNewUser = async (user) => {
-
-
-  const usersAdmin = await User.findAll({ 
+  const usersAdmin = await User.findAll({
     where: { roleId: 1 },
-    include: [{
-      model: Role, 
-      attributes: ['id']
-    }]
+    include: [
+      {
+        model: Role,
+        attributes: ["id"],
+      },
+    ],
   });
 
   if (!usersAdmin || usersAdmin.length === 0) {
-    return res.status(404).json({ message: "No se encontraron usuarios con roleId 1" });
+    return res
+      .status(404)
+      .json({ message: "No se encontraron usuarios con roleId 1" });
   }
 
   const emails = usersAdmin.map((user) => user.email);
 
-  console.log(emails)
-
+  console.log(emails);
 
   try {
     const transporter = nodemailer.createTransport({
@@ -133,7 +130,7 @@ const sendMailNewUser = async (user) => {
       theme: "cerberus",
       product: {
         name: "Registro de usuario ProdElevate",
-        link: "https://prodelevate.netlify.app/usuario",
+        link: `${ENDPOINT}usuario`,
       },
     });
 
@@ -152,7 +149,7 @@ const sendMailNewUser = async (user) => {
           button: {
             color: "#000924", // Optional action button color
             text: "Confirm your account",
-            link: "https://prodelevate.netlify.app/login",
+            link: `${ENDPOINT}login`,
           },
         },
         outro: [
@@ -167,11 +164,11 @@ const sendMailNewUser = async (user) => {
 
     const message = {
       from: process.env.EMAIL,
-      to: user.email, 
-      cc: emailRecipients.join(','), 
-      subject: "ProdElevate | Registro de usuario", 
-      html: mail
-    }
+      to: user.email,
+      cc: emailRecipients.join(","),
+      subject: "ProdElevate | Registro de usuario",
+      html: mail,
+    };
 
     await transporter.sendMail(message);
   } catch (error) {
