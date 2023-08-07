@@ -1,89 +1,186 @@
-const nodemailer = require('nodemailer');
-const Mailgen = require('mailgen');
+const { User, Role } = require("../../db");
+const { Sequelize } = require('sequelize');
+const { conn: sequelize  } = require("../../db");
+// const { sequelize } = require('../../models/User.js'); 
+const UserModel = sequelize.models.User;
 
+const nodemailer = require("nodemailer");
+const Mailgen = require("mailgen");
+
+
+
+
+
+
+/**  Notificacion de Creacion de producto  **/
 const sendMailer = async (product) => {
-  console.log(product.dataValues, 'dataValues ')
+
+  const usersAdmin = await User.findAll({ 
+    where: { roleId: 1 },
+    include: [{
+      model: Role, 
+      attributes: ['id']
+    }]
+  });
+
+  if (!usersAdmin || usersAdmin.length === 0) {
+    return res.status(404).json({ message: "No se encontraron usuarios con roleId 1" });
+  }
+
+  const emails = usersAdmin.map((user) => user.email);
+
+  console.log(emails)
+
+
+
   try {
     //  const { email } = req.params;
-    
+    //  console.log('desde nodemailer: ', email)
+
     const transporter = nodemailer.createTransport({
       // port: 465 - true, 567 - false
-      service: 'gmail',
+      service: "gmail",
       auth: {
-        user: 'mendozaveralucia@gmail.com',
-        pass: 'pgazpnjfbfvbkpxe'
-      }
+        user: "prodelevatepf@gmail.com",
+        pass: "znykqbnouxqdrrjf",
+      },
     });
 
     const MailGenerator = new Mailgen({
-      theme: 'salted',
+      theme: "cerberus",
       product: {
-        name: "Aviso de Stock Minimo",
-        link: 'https://mailgen.js'
-      }
-    })
+        name: "Alerta!! Creación de Nuevo producto",
+        link: "https://prodelevate.netlify.app/dashboard",
+        copyright: "Copyright © 2023 ProdElevate. All rights reserved.",
+      },
+    });
 
     const response = {
       body: {
-        name: 'Administrador',
-        intro: `El siguiente producto ha sido cerado en Base de datos prodElevate:`,
-        table : {
+        greeting: "Estimado,",
+        signature: "Atte",
+        name: "Administrador",
+        intro: `El siguiente producto ha sido creado en Base de datos prodElevate: 
+        debes dirigirte al panel administrativo para la configuración de Stock`,
+        table: {
           data: [
             {
-              // ID: `${product.dataValues.id}`,
               Producto: `${product.dataValues.name}`,
               Descripción: `${product.dataValues.description}`,
-              Stock_Minimo: `${product.dataValues.minStock} und.`
-            }
-          ]
+            },
+          ],
         },
-      //   action: {
-      //     instructions: 'To get started with Mailgen, please click here:',
-      //     button: {
-      //         color: '#22BC66', // Optional action button color
-      //         text: 'Confirm your account',
-      //         link: 'https://mailgen.js/confirm?s=d9729feb74992cc3482b350163a1a010'
-      //     }
-      // },
-        outro: 'Revisa el inventario del producto'   
-      }
-    }
+        action: {
+          instructions:
+            "Puedes revisar el estatus del producto y más en el Dashboard Administrativo:",
+          button: {
+            color: "#000924",
+            text: "Go to Dashboard",
+            link: "https://prodelevate.netlify.app/dashboard",
+          },
+        },
+        // outro: 'Revisa el inventario del producto'
+      },
+    };
+    const mail = MailGenerator.generate(response);
 
-    const mail = MailGenerator.generate(response)
+    
+   const message = {
+      from: "prodelevatepf@gmail.com", 
+      to: emails, 
+      subject: "Registro de nuevo producto", 
+      html: mail
+    };
+
+    await transporter.sendMail(message);
+  } catch (error) {
+    return console.log({ error: error.message });
+  }
+};
+
+/**  Notificacion de nuevo usuario  **/
+const sendMailNewUser = async (user) => {
+
+
+  const usersAdmin = await User.findAll({ 
+    where: { roleId: 1 },
+    include: [{
+      model: Role, 
+      attributes: ['id']
+    }]
+  });
+
+  if (!usersAdmin || usersAdmin.length === 0) {
+    return res.status(404).json({ message: "No se encontraron usuarios con roleId 1" });
+  }
+
+  const emails = usersAdmin.map((user) => user.email);
+
+  console.log(emails)
+
+
+  try {
+    const transporter = nodemailer.createTransport({
+      // port: 465 - true, 567 - false
+      service: "gmail",
+      auth: {
+        user: "prodelevatepf@gmail.com",
+        pass: "znykqbnouxqdrrjf",
+      },
+    });
+
+    const MailGenerator = new Mailgen({
+      theme: "cerberus",
+      product: {
+        name: "Registro de usuario ProdElevate",
+        link: "https://prodelevate.netlify.app/usuario",
+      },
+    });
+
+    const response = {
+      body: {
+        greeting: "Hola!",
+        signature: "Atentamente",
+        name: user.name,
+        intro: [
+          "¡Bienvenido a ProdElevate!",
+          "Estamos muy emocionados de tenerte con nosotros.",
+        ],
+        action: {
+          instructions:
+            "Para comenzar con ProdElevate, por favor haga click aqui:",
+          button: {
+            color: "#000924", // Optional action button color
+            text: "Confirm your account",
+            link: "https://prodelevate.netlify.app/login",
+          },
+        },
+        outro: [
+          "Si necesita ayuda o tiene alguna consulta, solo responde a este correo.",
+          "Nos encantaría ayudarte.",
+        ],
+      },
+    };
+
+    const mail = MailGenerator.generate(response);
+    const emailRecipients = [user.email, ...emails];
 
     const message = {
-      from: "prodelevatepf@gmail.com", // sender address
-      to: 'luisnaveda10@gmail.com', // list of receivers
-      subject: "Notificación de Creación de Producto", // Subject line
-      // text: "Hello world?", // plain text body
-      // html: "<b>Hello world  test</b>", // html body
+      from: process.env.EMAIL,
+      to: user.email, 
+      cc: emailRecipients.join(','), 
+      subject: "ProdElevate | Registro de usuario", 
       html: mail
     }
 
-    const info = await transporter.sendMail(message);
-    // console.log(info, 'infoo')
-    //   .then((info) => {
-    //   return res.status(201)
-    //   .json({ 
-    //     msg: 'debes recibir un email',
-    //     info: info.messageId,
-    //     preview: nodemailer.getTestMessageUrl(info)
-    //   })
-    // })
-    // .catch(error => {
-    //   return res.status(500).json({ error })
-    // })
-  
-  
-
-    // console.log(email, 'email')
-    // res.status(201).json('Enviado...')
+    await transporter.sendMail(message);
   } catch (error) {
-    // return res.status(400).json({ error: error.message });
+    //  return res.status(400).json({ error: error.message });
     throw error;
   }
-}
+};
 
 module.exports = {
-  sendMailer
-}
+  sendMailer,
+  sendMailNewUser,
+};
