@@ -48,6 +48,15 @@ const {
 } = require("../controllers/GET/getAllProductsInactive");
 const { putProductActive } = require("../controllers/PUT/putProductActive");
 const { verifyUser } = require("../controllers/POST/postVerifyUser");
+const {
+  getAllUsersInactive,
+} = require("../controllers/GET/getAllUsersInactive");
+const { getUserByName } = require("../controllers/GET/getUserByName");
+const { getAllFavorite } = require("../controllers/GET/getAllFavorite");
+const { postReview } = require("../controllers/POST/postReview");
+const { getAllReviewsId } = require("../controllers/GET/getAllReviewsId");
+const { getAllReviews } = require("../controllers/GET/getAllReviews");
+const { postStripeWebhook } = require("../controllers/POST/postStripeWebhook");
 
 router.use("/notification", mailerRoutes);
 
@@ -110,6 +119,8 @@ router.get("/role", getAllRole);
 
 router.get("/user", getAllUsers);
 router.get("/user/:id", getUserId);
+router.get("/user-inactive", getAllUsersInactive);
+router.get("/user-by-name", getUserByName);
 router.get("/useremail/:email", getUserByEmail);
 router.get("/userlog/:email", getUserByEmail);
 router.post("/user", postUser);
@@ -142,10 +153,16 @@ router.put("/provider/:id", putProvider);
 router.delete("/provider/:id", deleteProvider);
 
 router.post("/stripe", postStripe);
+router.post("/webhook", postStripeWebhook);
 
 router.post("/favorite", postFavorite);
+router.get("/favorite-all", getAllFavorite);
 router.delete("/favorite/:id", deleteFavorite);
 
 router.post("/filter/data", postFilterData);
+
+router.post("/comment", postReview);
+router.get("/comment/:id", getAllReviewsId);
+router.get("/comment", getAllReviews);
 
 module.exports = router;

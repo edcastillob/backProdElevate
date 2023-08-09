@@ -2,7 +2,6 @@ require("dotenv").config();
 const { Sequelize } = require("sequelize");
 const fs = require("fs");
 const path = require("path");
-const { DB_USER, DB_PASSWORD, DB_HOST, DB_NAME } = process.env;
 
 const {DB_DEPLOY } = process.env;
 const sequelize = new Sequelize( DB_DEPLOY,
@@ -62,6 +61,9 @@ Product.belongsTo(Category);
 
 Favorite.belongsToMany(User, { through: "FavUser" });
 User.belongsToMany(Favorite, { through: "FavUser" });
+
+// Product.hasMany(Reviews);
+// Reviews.belongsTo(Product);
 
 module.exports = {
   ...sequelize.models,
