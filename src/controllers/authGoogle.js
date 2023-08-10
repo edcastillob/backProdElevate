@@ -36,8 +36,7 @@ const checkEmail = async (req, res) => {
       return console.log('El email NO existe. Usuario registrado:', newUser.toJSON());
     }
   } catch (error) {
-    console.error('Error checking email:', email);
-    console.error('req.body:', req.body);
+    // console.error('Error checking email:', error);
     return res.status(500).json({ error: 'Internal server error' });
   }
 };

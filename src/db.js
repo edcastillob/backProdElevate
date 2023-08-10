@@ -2,17 +2,18 @@ require("dotenv").config();
 const { Sequelize } = require("sequelize");
 const fs = require("fs");
 const path = require("path");
+const { DB_USER, DB_PASSWORD, DB_HOST, DB_NAME } = process.env;
 
-const {DB_DEPLOY } = process.env;
-const sequelize = new Sequelize( DB_DEPLOY,
-{
-
-  dialect: 'postgres',
-  protocol: 'postgres',
-  dialectOptions: {
-    ssl: true,
-  },
-});
+const sequelize = new Sequelize(
+  `postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}/${DB_NAME}`,
+  {
+    logging: false,
+    native: false,
+    // direct: {
+    //   freezeTableName: true
+    // }
+  }
+);
 
 const basename = path.basename(__filename);
 
@@ -61,9 +62,6 @@ Product.belongsTo(Category);
 
 Favorite.belongsToMany(User, { through: "FavUser" });
 User.belongsToMany(Favorite, { through: "FavUser" });
-
-// Product.hasMany(Reviews);
-// Reviews.belongsTo(Product);
 
 module.exports = {
   ...sequelize.models,

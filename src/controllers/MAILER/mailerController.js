@@ -5,23 +5,22 @@ const UserModel = sequelize.models.User;
 const nodemailer = require("nodemailer");
 const Mailgen = require("mailgen");
 
-const ENDPOINT = 'https://prodelevate.netlify.app/';
+const ENDPOINT = 'http://localhost:5173/';
 
 
 /**  Notificacion de Creacion de producto  **/
 const sendMailer = async (product) => {
-  const usersAdmin = await User.findAll({
+
+  const usersAdmin = await User.findAll({ 
     where: { roleId: 1 },
-    include: [
-      {
-        model: Role,
-        attributes: ["id"],
-      },
-    ],
+    include: [{
+      model: Role, 
+      attributes: ['id']
+    }]
   });
 
   if (!usersAdmin || usersAdmin.length === 0) {
-    return console.log(error);
+    return console.log(error)
   }
 
   const emails = usersAdmin.map((user) => user.email);
@@ -76,11 +75,12 @@ const sendMailer = async (product) => {
     };
     const mail = MailGenerator.generate(response);
 
-    const message = {
-      from: "prodelevatepf@gmail.com",
-      to: emails,
-      subject: "Registro de nuevo producto",
-      html: mail,
+    
+   const message = {
+      from: "prodelevatepf@gmail.com", 
+      to: emails, 
+      subject: "Registro de nuevo producto", 
+      html: mail
     };
 
     await transporter.sendMail(message);
@@ -91,14 +91,14 @@ const sendMailer = async (product) => {
 
 /**  Notificacion de nuevo usuario  **/
 const sendMailNewUser = async (user) => {
-  const usersAdmin = await User.findAll({
+
+
+  const usersAdmin = await User.findAll({ 
     where: { roleId: 1 },
-    include: [
-      {
-        model: Role,
-        attributes: ["id"],
-      },
-    ],
+    include: [{
+      model: Role, 
+      attributes: ['id']
+    }]
   });
 
   if (!usersAdmin || usersAdmin.length === 0) {
@@ -108,7 +108,8 @@ const sendMailNewUser = async (user) => {
 
   const emails = usersAdmin.map((user) => user.email);
 
-  console.log(emails);
+  console.log(emails)
+
 
   try {
     const transporter = nodemailer.createTransport({
@@ -158,11 +159,11 @@ const sendMailNewUser = async (user) => {
 
     const message = {
       from: process.env.EMAIL,
-      to: user.email,
-      cc: emailRecipients.join(","),
-      subject: "ProdElevate | Registro de usuario",
-      html: mail,
-    };
+      to: user.email, 
+      cc: emailRecipients.join(','), 
+      subject: "ProdElevate | Registro de usuario", 
+      html: mail
+    }
 
     await transporter.sendMail(message);
   } catch (error) {
