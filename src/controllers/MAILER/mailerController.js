@@ -5,7 +5,7 @@ const UserModel = sequelize.models.User;
 const nodemailer = require("nodemailer");
 const Mailgen = require("mailgen");
 
-const ENDPOINT = 'http://localhost:5173/';
+const ENDPOINT = 'https://prodelevate.netlify.app/';
 
 
 /**  Notificacion de Creacion de producto  **/
