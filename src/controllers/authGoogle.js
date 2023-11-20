@@ -1,15 +1,15 @@
 const { User } = require("../db");
 
 const checkEmail = async (req, res) => {
-//   console.log('desde check email: ', req.body);
+  console.log('desde check email: ', req.body);
   try {
     const { email } = req.body;
     const existingUser = await User.findOne({ where: { email } });
 
     if (existingUser) {
-    //   return console.log('El email existe');
+      return console.log('El email existe');
     } else {
-    //   console.log('El email no existe');
+      console.log('El email no existe');
       const { displayName, uid, email, photoURL, phoneNumber } = req.body;
 
       const name = displayName;
@@ -36,7 +36,7 @@ const checkEmail = async (req, res) => {
       return console.log('El email NO existe. Usuario registrado:', newUser.toJSON());
     }
   } catch (error) {
-    // console.error('Error checking email:', error);
+    console.error('Error checking email:', error);
     return res.status(500).json({ error: 'Internal server error' });
   }
 };
